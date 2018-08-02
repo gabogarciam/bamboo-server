@@ -6,6 +6,7 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+const cors = require('cors');
 
 const auth = require('./routes/auth');
 
@@ -13,12 +14,20 @@ const app = express();
 
 // -- DB Connection -- //
 mongoose.Promise = Promise;
-mongoose.connect('mongodb://localhost/cloneTwitter-DB', {
+mongoose.connect('mongodb://localhost/db-cloneTwitter', {
   keepAlive: true,
   reconnectTries: Number.MAX_VALUE
 });
 
-// -- Session -- //
+// -- Middlewares -- //
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(cors({
+  credentials: true,
+  origin: ['http://localhost:4200']
+}));
 app.use(session({
   store: new MongoStore({
     mongooseConnection: mongoose.connection,
@@ -31,12 +40,6 @@ app.use(session({
     maxAge: 24 * 60 * 60 * 1000
   }
 }));
-
-// -- Middlewares -- //
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 
 // -- Routes -- //
 app.use('/auth', auth);
