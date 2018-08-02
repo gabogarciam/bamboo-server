@@ -1,28 +1,44 @@
 'use strict';
-
+// require npm packages
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 
 const auth = require('./routes/auth');
 
 const app = express();
 
-// DB CONNECT //
+// -- DB Connection -- //
 mongoose.Promise = Promise;
 mongoose.connect('mongodb://localhost/cloneTwitter-DB', {
   keepAlive: true,
   reconnectTries: Number.MAX_VALUE
 });
 
-// -- middlewares
+// -- Session -- //
+app.use(session({
+  store: new MongoStore({
+    mongooseConnection: mongoose.connection,
+    ttl: 24 * 60 * 60 // 1 day
+  }),
+  secret: 'some-string',
+  resave: true,
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000
+  }
+}));
+
+// -- Middlewares -- //
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Routes
+// -- Routes -- //
 app.use('/auth', auth);
 
 // -- 404 and error handler
