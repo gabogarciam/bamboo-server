@@ -3,10 +3,18 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const mongoose = require('mongoose');
 
 const auth = require('./routes/auth');
 
 const app = express();
+
+// DB CONNECT //
+mongoose.Promise = Promise;
+mongoose.connect('mongodb://localhost/cloneTwitter-DB', {
+  keepAlive: true,
+  reconnectTries: Number.MAX_VALUE
+});
 
 // -- middlewares
 app.use(logger('dev'));
