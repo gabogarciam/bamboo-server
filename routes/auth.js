@@ -7,8 +7,12 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 
 /* GET users listing. */
-router.get('/', (req, res, next) => {
-  res.send('respond with a resource');
+router.get('/me', (req, res, next) => {
+  if (req.session.currentUser) {
+    res.json(req.session.currentUser);
+  } else {
+    res.status(404).json({code: 'not-found'});
+  }
 });
 
 router.post('/signup', (req, res, next) => {
@@ -44,6 +48,38 @@ router.post('/signup', (req, res, next) => {
         });
     })
     .catch(next);
+});
+
+router.post('/login', (req, res, next) => {
+  if (req.session.currentUser) {
+    return res.status(401).json({code: 'unauthorized'});
+  }
+
+  const username = req.body.username;
+  const password = req.body.password;
+
+  if (!username || !password) {
+    return res.status(422).json({code: 'validation'});
+  }
+
+  User.findOne({ username })
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({code: 'not-found'});
+      }
+      if (bcrypt.compareSync(password, user.password)) {
+        req.session.currentUser = user;
+        return res.json(user);
+      } else {
+        return res.status(404).json({code: 'not-found'});
+      }
+    })
+    .catch(next);
+});
+
+router.post('/logout', (req, res) => {
+  req.session.currentUser = null;
+  return res.status(204).send();
 });
 
 module.exports = router;
