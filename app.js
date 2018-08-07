@@ -1,5 +1,6 @@
 'use strict';
 // require npm packages
+require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -14,7 +15,7 @@ const app = express();
 
 // -- DB Connection -- //
 mongoose.Promise = Promise;
-mongoose.connect('mongodb://localhost/db-cloneTwitter', {
+mongoose.connect(process.env.MONGODB_URI, {
   keepAlive: true,
   reconnectTries: Number.MAX_VALUE
 });
@@ -28,7 +29,7 @@ app.use(cookieParser());
 // -- Cors -- //
 app.use(cors({
   credentials: true,
-  origin: ['http://localhost:4200']
+  origin: [process.env.CLIENT_URL]
 }));
 app.use(session({
   store: new MongoStore({
