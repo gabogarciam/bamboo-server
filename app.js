@@ -10,6 +10,8 @@ const MongoStore = require('connect-mongo')(session);
 const cors = require('cors');
 
 const auth = require('./routes/auth');
+const user = require('./routes/user');
+const follow = require('./routes/follow');
 
 const app = express();
 
@@ -46,6 +48,8 @@ app.use(session({
 
 // -- Routes -- //
 app.use('/auth', auth);
+app.use('/user', user);
+app.use('/follow', follow);
 
 /// catch 404 and forward to error handler
 app.use((req, res, next) => {
