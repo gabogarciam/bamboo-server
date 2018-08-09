@@ -12,6 +12,7 @@ const cors = require('cors');
 const auth = require('./routes/auth');
 const user = require('./routes/user');
 const follow = require('./routes/follow');
+const publication = require('./routes/publication');
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use(session({
 app.use('/auth', auth);
 app.use('/user', user);
 app.use('/follow', follow);
+app.use('/publication', publication);
 
 /// catch 404 and forward to error handler
 app.use((req, res, next) => {
