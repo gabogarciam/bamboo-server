@@ -29,11 +29,11 @@ router.get('/refresh', (req, res, next) => {
 
 /* GET a specifically user */
 router.get('/find/:id?', (req, res, next) => {
-  // if (req.session.currentUser) {
-  //   return res.status(401).json({code: 'unauthorized'});
-  // }
+  if (!req.session.currentUser) {
+    return res.status(401).json({code: 'unauthorized'});
+  }
   const userId = req.params.id;
-  // consultar si puedo pasar por params el id del usuario a buscar
+
   const userlogged = req.session.currentUser._id;
 
   User.findById(userId)
@@ -51,7 +51,7 @@ router.get('/find/:id?', (req, res, next) => {
 
 /* GET all user's in the Database */
 router.get('/list', (req, res, next) => {
-  if (req.session.currentUser) {
+  if (!req.session.currentUser) {
     return res.status(401).json({code: 'unauthorized'});
   }
 
@@ -64,9 +64,9 @@ router.get('/list', (req, res, next) => {
 
 /* Edit user */
 router.put('/edit', (req, res, next) => {
-  // if (req.session.currentUser) {
-  //   return res.status(401).json({code: 'unauthorized'});
-  // }
+  if (!req.session.currentUser) {
+    return res.status(401).json({code: 'unauthorized'});
+  }
 
   const userId = req.session.currentUser._id;
   const reqBody = req.body;
@@ -87,9 +87,9 @@ router.put('/edit', (req, res, next) => {
 
 /* upload avatar user */
 router.post('/upload-avatar', multipartUpload, (req, res, next) => {
-  // if (req.session.currentUser) {
-  //   return res.status(401).json({code: 'unauthorized'});
-  // }
+  if (!req.session.currentUser) {
+    return res.status(401).json({code: 'unauthorized'});
+  }
 
   const userId = req.session.currentUser._id;
 
@@ -133,7 +133,7 @@ router.post('/upload-avatar', multipartUpload, (req, res, next) => {
 });
 
 router.get('/get-avatar', (req, res, next) => {
-  if (req.session.currentUser) {
+  if (!req.session.currentUser) {
     return res.status(401).json({code: 'unauthorized'});
   }
   const userId = req.session.currentUser._id;

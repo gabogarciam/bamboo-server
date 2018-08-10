@@ -7,9 +7,9 @@ const Follow = require('../models/follow');
 
 // -- Follow someone --//
 router.post('/save-follow', (req, res, next) => {
-//   if (req.session.currentUser) {
-//     return res.status(401).json({code: 'unauthorized'});
-//   }
+  if (!req.session.currentUser) {
+    return res.status(401).json({code: 'unauthorized'});
+  }
   // const reqBody = req.body;
   const follow = new Follow();
 
@@ -53,9 +53,9 @@ router.delete('/unfollow', (req, res, next) => {
 
 // -- List of users that I follow --//
 router.get('/following-users', (req, res, next) => {
-//   if (req.session.currentUser) {
-//     return res.status(401).json({code: 'unauthorized'});
-//   }
+  if (!req.session.currentUser) {
+    return res.status(401).json({code: 'unauthorized'});
+  }
 
   const userId = req.session.currentUser._id;
 
@@ -72,9 +72,9 @@ router.get('/following-users', (req, res, next) => {
 
 // -- List of users who follow me --//
 router.get('/followed-users', (req, res, next) => {
-  //   if (req.session.currentUser) {
-  //     return res.status(401).json({code: 'unauthorized'});
-  //   }
+  if (!req.session.currentUser) {
+    return res.status(401).json({code: 'unauthorized'});
+  }
 
   const userId = req.session.currentUser._id;
 

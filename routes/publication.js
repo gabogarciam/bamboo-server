@@ -10,12 +10,12 @@ const multipartUpload = multipart({uploadDir: './uploads/publications'});
 
 const Publication = require('../models/publication');
 // const User = require('../models/user');
-// c onst Follow = require('../models/follow');
+// const Follow = require('../models/follow');
 
 router.post('/save-publication', (req, res, next) => {
-//   if (req.session.currentUser) {
-//     return res.status(401).json({code: 'unauthorized'});
-//   }
+  if (!req.session.currentUser) {
+    return res.status(401).json({code: 'unauthorized'});
+  }
 
   const reqBody = req.body;
 
@@ -33,10 +33,15 @@ router.post('/save-publication', (req, res, next) => {
     .catch(next);
 });
 
-router.get('/get-publication/:id?', (req, res, next) => {
-  const publicationId = req.params.id;
+// -- Get all publications by user -- //
+router.get('/get-publication', (req, res, next) => {
+  if (!req.session.currentUser) {
+    return res.status(401).json({code: 'unauthorized'});
+  }
 
-  Publication.findById(publicationId)
+  const user = req.session.currentUser._id;
+
+  Publication.find({user})
     .then((publication) => {
       return res.status(200).send(publication);
     })
@@ -56,9 +61,9 @@ router.delete('/delete-publication/:id?', (req, res, next) => {
 
 /* upload files to publication */
 router.post('/upload-image-publication/:id', multipartUpload, (req, res, next) => {
-  // if (req.session.currentUser) {
-  //   return res.status(401).json({code: 'unauthorized'});
-  // }
+  if (!req.session.currentUser) {
+    return res.status(401).json({code: 'unauthorized'});
+  }
 
   let publicationId = req.params.id;
 
