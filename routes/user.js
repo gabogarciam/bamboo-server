@@ -74,6 +74,8 @@ router.put('/edit', (req, res, next) => {
   delete reqBody.password;
   delete reqBody.role;
 
+  /* verificar el nombre del usuario y en una mejora el email ya exiten */
+
   User.findByIdAndUpdate(userId, reqBody, {new: true})
     .then(user => {
       if (!user) {
@@ -156,9 +158,11 @@ router.get('/get-avatar', (req, res, next) => {
 // Counter Followin and follow
 router.get('/counters-follow/:id?', (req, res, next) => {
   let userId = req.session.currentUser._id;
+
   if (req.params.id) {
     userId = req.params.id;
   }
+
   getCountFollow(userId)
     .then((value) => {
       return res.status(200).send(value);

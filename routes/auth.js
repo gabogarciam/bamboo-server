@@ -24,7 +24,7 @@ router.post('/signup', (req, res, next) => {
   }
 
   const username = req.body.username;
-  const email = null;
+  const email = req.body.email;
   const password = req.body.password;
   const role = 'ROLE_USER';
   const image = null;
