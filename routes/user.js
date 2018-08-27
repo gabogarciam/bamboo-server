@@ -10,6 +10,7 @@ const multipartUpload = multipart({uploadDir: './uploads/users'});
 
 const User = require('../models/user');
 const Follow = require('../models/follow');
+const Publication = require('../models/publication');
 
 router.get('/refresh', (req, res, next) => {
   if (req.session.currentUser) {
@@ -171,14 +172,16 @@ router.get('/counters-follow/:id?', (req, res, next) => {
 });
 
 async function getCountFollow (userId) {
-  var promise1 = Follow.count({'user': userId});
-  var promise2 = Follow.count({'followed': userId});
+  let promise1 = Follow.count({'user': userId});
+  let promise2 = Follow.count({'followed': userId});
+  let promise3 = Publication.count({'user': userId});
 
-  return Promise.all([promise1, promise2])
+  return Promise.all([promise1, promise2, promise3])
     .then(results => {
       return {
         following: results[0],
-        followed: results[1]
+        followed: results[1],
+        publications: results[2]
       };
     });
 }
