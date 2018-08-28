@@ -20,6 +20,9 @@ const userSchema = new Schema({
   },
   image: {
     type: String
+  },
+  biography: {
+    type: String
   }
 }, {
   timestamps: true
