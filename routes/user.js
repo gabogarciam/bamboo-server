@@ -2,12 +2,17 @@
 
 const express = require('express');
 const router = express.Router();
-const multipart = require('connect-multiparty');
 const fs = require('fs');
 const path = require('path');
 
+// -- Upload images -- //
+// const multer = require('multer');
+// const upload = multer({dest: '../uploads/users'});
+
+const multipart = require('connect-multiparty');
 const multipartUpload = multipart({uploadDir: './uploads/users'});
 
+// -- Models -- //
 const User = require('../models/user');
 const Follow = require('../models/follow');
 const Publication = require('../models/publication');
@@ -71,19 +76,26 @@ router.put('/edit', (req, res, next) => {
 
   const userId = req.session.currentUser._id;
   const reqBody = req.body;
+  const username = req.body.username;
 
   delete reqBody.password;
   delete reqBody.role;
 
-  /* verificar el nombre del usuario y en una mejora el email ya exiten */
-
-  User.findByIdAndUpdate(userId, reqBody, {new: true})
-    .then(user => {
-      if (!user) {
-        return res.status(404).json({code: 'not-found'});
+  /* En una mejora futura verificar que el email ya exite */
+  User.findOne({username}, 'username')
+    .then((userExists) => {
+      if (userExists.id !== userId) {
+        return res.status(422).json({code: 'username-not-unique'});
       }
-      req.session.currentUser = user;
-      return res.json(user);
+      User.findByIdAndUpdate(userId, reqBody, {new: true})
+        .then(user => {
+          if (!user) {
+            return res.status(404).json({code: 'not-found'});
+          }
+          req.session.currentUser = user;
+          return res.json(user);
+        })
+        .catch(next);
     })
     .catch(next);
 });
@@ -95,15 +107,15 @@ router.post('/upload-avatar', multipartUpload, (req, res, next) => {
   }
 
   const userId = req.session.currentUser._id;
-
   const reqBody = req.body;
+
   delete reqBody.password;
   delete reqBody.role;
 
   User.findById(userId)
-    .then((user) => {
-      if (req.files) {
-        const filePath = req.files.image.path;
+    .then((userExists) => {
+      if (userExists && req.files) {
+        const filePath = req.files.photo.path;
         const fileSplit = filePath.split('/');
         const fileName = fileSplit[2];
         const extSplit = fileName.split('.');
@@ -112,16 +124,16 @@ router.post('/upload-avatar', multipartUpload, (req, res, next) => {
         if (fileExt === 'png' || fileExt === 'jpg' || fileExt === 'jpeg' || fileExt === 'gif') {
           User.findByIdAndUpdate(userId, {image: fileName}, {new: true}, (err, userUpdate) => {
             if (err) return res.status(500).send({code: 'unexpected'});
-            if (!userUpdate) return res.status(404).send({code: 'user dont updated'});
+            if (!userUpdate) return res.status(404).send({code: 'user-dont-updated'});
 
             req.session.currentUser = userUpdate;
             return res.status(200).send({user: userUpdate});
           });
         } else {
-          return removeFilesUpload(res, filePath, 'Invalid extension');
+          return removeFilesUpload(res, filePath, 'Invalid-extension');
         }
       } else {
-        return res.status(200).send({ code: 'image not found' });
+        return res.status(200).send({ code: 'image-not-found' });
       }
     })
     .catch(next);

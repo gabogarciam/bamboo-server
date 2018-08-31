@@ -15,8 +15,6 @@ router.get('/me', (req, res, next) => {
   }
 });
 
-/* POST */
-
 // --Signup --//
 router.post('/signup', (req, res, next) => {
   if (req.session.currentUser) {
@@ -26,8 +24,9 @@ router.post('/signup', (req, res, next) => {
   const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
+  const biography = null;
   const role = 'ROLE_USER';
-  const image = null;
+  const image = 'avatar-default-300x300.png';
 
   if (!username || !password) {
     return res.status(422).json({code: 'validation'});
@@ -46,6 +45,7 @@ router.post('/signup', (req, res, next) => {
         username,
         email,
         password: hashPass,
+        biography,
         role,
         image
       });
